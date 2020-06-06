@@ -3,15 +3,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Graphics extends JFrame implements ActionListener, MouseListener {
+public class Graphics extends JFrame implements ActionListener{
     JComboBox cbA, cbB;
     JButton btAnadir, btQuitar, btTraspasar1, btTraspasar2;
     JTextField anade, quita;
     JLabel seleccion, cantidad, tiempo; // Quiero **entender** que no te confundes al decir 3 JLabels y uno es para el
                                         // tiempo
     Timer t;
-    ArrayList<String> listaA = new ArrayList();
-    ArrayList<String> listaB = new ArrayList();
     int seg = 0;
     int min = 0;
     int reset = 0;
@@ -23,16 +21,14 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
         setLayout(null);
         System.out.println(cbA);
         // Combos
-        cbA = sacamosPuntosYComas("No; Se; De; Que; Va; Esto", listaA, cbA);
-        cbB = sacamosPuntosYComas("Curro; Matiza; Mas; Lo; Que;Quieres", listaB, cbB);
-        cbA.setSize(cbA.getPreferredSize().width, cbA.getPreferredSize().height);
-        cbB.setSize(cbB.getPreferredSize().width, cbB.getPreferredSize().height);
+        cbA = new JComboBox<>();
+        cbB = new JComboBox<>();
+        cbA.setSize(150, cbA.getPreferredSize().height);
+        cbB.setSize(150, cbB.getPreferredSize().height);
         cbA.setLocation(50, 0);
         cbB.setLocation(200, 0);
-        cbA.setSelectedIndex(0);
-        cbB.setSelectedIndex(0);
         cbA.setToolTipText("Lista A");
-        cbB.setToolTipText(listaB.get(cbB.getSelectedIndex()));
+        cbB.setToolTipText("" + cbB.getSelectedIndex());
         add(cbA);
         add(cbB);
 
@@ -48,7 +44,7 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
         btQuitar.setSize(btQuitar.getPreferredSize().width, btQuitar.getPreferredSize().height);
         btQuitar.setLocation(200, 75);
         btQuitar.addActionListener(this);
-        btQuitar.addMouseListener(this);
+        btQuitar.addMouseListener(new controlRaton());
         btQuitar.setToolTipText("Quita un elmento de lista A");
         add(btQuitar);
 
@@ -82,7 +78,7 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
         add(quita);
 
         // Labels
-        seleccion = new JLabel("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+        seleccion = new JLabel("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
         seleccion.setSize(seleccion.getPreferredSize().width + 50, seleccion.getPreferredSize().height);
         seleccion.setLocation(50, 150);
         seleccion.setToolTipText("Bastante descriptivo");
@@ -107,6 +103,7 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
 
         // Dejo esto aqui para que no salte excepcion
         cbA.addActionListener(this);
+        cbB.addActionListener(this);
     }
 
     @Override
@@ -124,15 +121,12 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
         }
         if (reset == 60) {
             cbA.removeAllItems();
-            ;
             cbB.removeAllItems();
-            ;
-            sacamosPuntosYComas("No; Se; De; Que; Va; Esto", listaA, cbA);
-            sacamosPuntosYComas("Curro; Matiza; Mas; Lo; Que;Quieres", listaB, cbB);
+
             anade.setText("");
             quita.setText("");
             cantidad.setText("Cantidad de elementos - " + cbA.getItemCount());
-            seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
         }
 
         // Ya estaria el timer
@@ -140,75 +134,62 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
         if (e.getSource() == anade || e.getSource() == btAnadir) {
             sacamosPuntosYComas();
             cantidad.setText("Cantidad de elementos - " + cbA.getItemCount());
-            seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
         }
 
         if (e.getSource() == quita || e.getSource() == btQuitar) {
             quitamosListaA();
             cantidad.setText("Cantidad de elementos - " + cbA.getItemCount());
-            seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
         }
 
         if (e.getSource() == btTraspasar1) {
             cambio(cbA, cbB);
             cantidad.setText("Cantidad de elementos - " + cbA.getItemCount());
-            seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
+            cbB.setToolTipText("" + cbB.getSelectedIndex());
         }
         if (e.getSource() == btTraspasar2) {
             cambio(cbB, cbA);
             cantidad.setText("Cantidad de elementos - " + cbA.getItemCount());
-            seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
         }
 
-       if(e.getSource() == cbA){
-            if(vienesDeMetodo){
-                vienesDeMetodo = false;
-            }else{
-                seleccion.setText("Componente seleccionado - " + listaA.get(cbA.getSelectedIndex()));
-        
-            }
-       }
+        if (e.getSource() == cbA) {
+            seleccion.setText("Componente seleccionado - " + (cbA.getSelectedIndex() + 1));
+        }
+
+        if (e.getSource() == cbB) {
+            cbB.setToolTipText("" + cbB.getSelectedIndex());
+        }
     }
 
     public void quitamosListaA() {
-        System.err.println(listaA.size() + "  ---- " + cbA.getItemCount());
         vienesDeMetodo = true;
-        if (listaA.size() > 1) {
+        if (cbA.getItemCount() > 0) {
             String inicio = quita.getText().toUpperCase();
 
             if (!inicio.equals("")) {
-                System.err.println(listaA.size() + "  --B-- " + cbA.getItemCount());
-                for (int i = listaA.size() - 1; i >= 0; i--) {
-                    if (listaA.size() > 1) {
-                        if (listaA.get(i).toUpperCase().startsWith(inicio)) {
-                            listaA.remove(i);
-                            cbA.removeItemAt(i);
-                        }
-                    }else{
-                        JOptionPane.showMessageDialog(this, "La lista no puede quedar vacia", "Error", 0); // Si, norma mia, no se
-                                                                                               // especifica lo
-                                                                                               // contrario
-                        //Y esta copiao y pegado ¿eh? que desgraciao soy
+                for (int i = cbA.getItemCount() - 1; i >= 0; i--) {
+
+                    if (cbA.getItemAt(i).toString().toUpperCase().startsWith(inicio)) {
+
+                        cbA.removeItemAt(i);
+
                     }
                 }
             } else {
-                System.err.println(listaA.size() + "  --C-- " + cbA.getItemCount());
-                listaA.remove(cbA.getSelectedIndex());
                 cbA.removeItemAt(cbA.getSelectedIndex());
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "La lista no puede quedar vacia", "Error", 0); // Si, norma mia, no se
-                                                                                               // especifica lo
-                                                                                               // contrario
         }
-        System.err.println(listaA.size() + "  --D-- " + cbA.getItemCount());
+
     }
 
     public void sacamosPuntosYComas() {
-        sacamosPuntosYComas(anade.getText(), listaA, cbA);
+        sacamosPuntosYComas(anade.getText(), cbA);
     }
 
-    public JComboBox sacamosPuntosYComas(String texto, ArrayList<String> lista, JComboBox cajon) {
+    public JComboBox sacamosPuntosYComas(String texto, JComboBox cajon) {
         vienesDeMetodo = true;
         if (texto.contains(";")) {
             boolean tieneAlgo = false;
@@ -221,72 +202,37 @@ public class Graphics extends JFrame implements ActionListener, MouseListener {
                     }
                 }
                 if (tieneAlgo) {
-                    lista.add(listaProv[i].trim());
-                    if (cajon != null) {
-                        cajon.addItem(listaProv[i].trim());
-                    } else {
-                        cajon = new JComboBox(lista.toArray());
-                    }
+
+                    cajon.addItem(listaProv[i].trim());
+
                 }
             }
 
-        } else {
-            lista.add(texto.trim());
-            if (cajon != null) {
-                cajon.addItem(texto.trim());
-            } else {
-                cajon = new JComboBox(lista.toArray());
-            }
         }
+        cajon.addItem(texto.trim());
+
         return cajon; // Un poco gitano pero si no, no me lo quiere construir
     }
 
     public void cambio(JComboBox lista1, JComboBox lista2) {
-        if (lista1.getItemCount() > 1) {
+        if (lista1.getItemCount() > 0) {
             lista2.addItem(lista1.getSelectedItem());
             lista1.removeItemAt(lista1.getSelectedIndex());
-            if (lista1 == cbA) {
-                listaB.add(listaA.get(lista1.getSelectedIndex()));
-                listaA.remove(lista1.getSelectedIndex());
-            } else {
-                listaA.add(listaB.get(lista1.getSelectedIndex()));
-                listaB.remove(lista1.getSelectedIndex());
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "La lista no puede quedar vacia", "Error", 0); // Si, norma mia, no se
-                                                                                               // especifica lo
-                                                                                               // contrario
+        }
+
+    }
+
+    private class controlRaton extends MouseAdapter {
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            btQuitar.setBackground(Color.red);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            btQuitar.setBackground(new JButton().getBackground());
+
         }
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        btQuitar.setBackground(Color.red);
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        btQuitar.setBackground(new JButton().getBackground());
-
-    }
-
-  
 }
